@@ -3,11 +3,12 @@ import io,os
 from openpyxl import Workbook
 from openpyxl.compat import range
 from openpyxl import load_workbook
+import re
 import datetime,time
 import traceback
 
-sourcefile = u'/root/ms.xlsx' 
-outputfile = u'/root/msout.xlsx'  
+sourcefile = u'/home/admin/18eg.xlsx' 
+outputfile = u'/home/admin/18egout.xlsx'  
 
 index = 1;
 
@@ -54,12 +55,26 @@ ws.cell(column=35, row=1).value = u"驳回次数"
 ws.cell(column=36, row=1).value = u"驳回次数(银行)"
 ws.cell(column=37, row=1).value = u"驳回次数(非银行)"
 
+
+def max_mount(zone_list):
+    num_zone = []
+    zone_dic = {'0':'0W～0.2W', '0.2':'0.2W～0.5W', '0.5':'0.5W～1W', '1':'1W～3W', '3':'3W～5W', '5':'5W～10W', '10':'10W以上'}
+    if len(zone_list) > 0:
+        for zone in zone_list:
+            num = zone.split('W')[0]
+            num_zone.append(num)
+        ordered_num_zone = sorted(num_zone)
+        max_zone = zone_dic[ordered_num_zone[-1]]
+    else:
+        max_zone = 0
+    return max_zone
+
 writeIndex = 2
 try:
     for row in sheet.rows:
         if index > 1:
             serialNO = row[0].value
-            if serialNO <> None:
+            if serialNO != None:
                 name = row[1].value
                 phoneNO = row[2].value
                 IDNO = row[3].value
@@ -124,96 +139,55 @@ try:
 
 
                 #Write File
-                    ws.cell(column=1, row=writeIndex).value = serialNO
-                    ws.cell(column=2, row=writeIndex).value = name
-                    ws.cell(column=3, row=writeIndex).value = phoneNO
-                    ws.cell(column=4, row=writeIndex).value = IDNO
-                    ws.cell(column=5, row=writeIndex).value = ApplyTime
-                    ws.cell(column=6, row=writeIndex).value = platformStr
+                ws.cell(column=1, row=writeIndex).value = serialNO
+                ws.cell(column=2, row=writeIndex).value = name
+                ws.cell(column=3, row=writeIndex).value = phoneNO
+                ws.cell(column=4, row=writeIndex).value = IDNO
+                ws.cell(column=5, row=writeIndex).value = ApplyTime
+                ws.cell(column=6, row=writeIndex).value = reg_info
+                ws.cell(column=7, row=writeIndex).value = reg
+                ws.cell(column=8, row=writeIndex).value = reg_Bank
+                ws.cell(column=9, row=writeIndex).value = reg_NoBank
+                ws.cell(column=10, row=writeIndex).value = app_info
+                ws.cell(column=11, row=writeIndex).value = app
+                ws.cell(column=12, row=writeIndex).value = app_Bank
+                ws.cell(column=13, row=writeIndex).value = app_NoBank
+                ws.cell(column=14, row=writeIndex).value = appMount_0t2k
+                ws.cell(column=15, row=writeIndex).value = appMount_2t5k
+                ws.cell(column=16, row=writeIndex).value = appMount_5t10k
+                ws.cell(column=17, row=writeIndex).value = appMount_10t30k
+                ws.cell(column=18, row=writeIndex).value = appMount_30t50k
+                ws.cell(column=19, row=writeIndex).value = appMount_50t100k
+                ws.cell(column=20, row=writeIndex).value = appMount_100kt
+                ws.cell(column=21, row=writeIndex).value = max_app_zone
+                ws.cell(column=22, row=writeIndex).value = loan_info
+                ws.cell(column=23, row=writeIndex).value = loan
+                ws.cell(column=24, row=writeIndex).value = loan_Bank
+                ws.cell(column=25, row=writeIndex).value = loan_NoBank
+                ws.cell(column=26, row=writeIndex).value = loanMount_0t2k
+                ws.cell(column=27, row=writeIndex).value = loanMount_2t5k
+                ws.cell(column=28, row=writeIndex).value = loanMount_5t10k
+                ws.cell(column=29, row=writeIndex).value = loanMount_10t30k
+                ws.cell(column=30, row=writeIndex).value = loanMount_30t50k
+                ws.cell(column=31, row=writeIndex).value = loanMount_50t100k
+                ws.cell(column=32, row=writeIndex).value = loanMount_100kt
+                ws.cell(column=33, row=writeIndex).value = max_loan_zone
+                ws.cell(column=34, row=writeIndex).value = rej_info
+                ws.cell(column=35, row=writeIndex).value = rej
+                ws.cell(column=36, row=writeIndex).value = rej_Bank
+                ws.cell(column=37, row=writeIndex).value = rej_NoBank
 
-                    ApplicationStr = ''
-                    for Application in outApplicationinfo:
-                        ApplicationStr = Application + '\r' + ApplicationStr
-                    ws.cell(column=7, row=writeIndex).value = ApplicationStr
-
-                    LoansStr = ''
-                    for Loans in outLoansinfo:
-                        LoansStr = Loans + '\r' + LoansStr
-                    ws.cell(column=8, row=writeIndex).value = LoansStr
-
-                    RejectStr = ''
-                    for Reject in outRejectinfo:
-                        RejectStr = Reject + '\r' + RejectStr
-                    ws.cell(column=9, row=writeIndex).value = RejectStr
-
-                    writeIndex = writeIndex + 1
+                writeIndex = writeIndex + 1
             # break
         index += 1
         if index%1000 == 0:
-            print index
+            print(index)
 
 
         #写文件
 
-except Exception , e:
-    print traceback.print_exc()
-    print u"在第%d行出错"%(index)
+except Exception as e:
+    print(traceback.print_exc())
+    print(f"在第{index}行出错")
 finally:
     wbout.save(outputfile)
-#coding: utf-8
-import re
-
-def max_mount(zone_list):
-    num_zone = []
-    zone_dic = {'0':'0W～0.2W', '0.2':'0.2W～0.5W', '0.5':'0.5W～1W', '1':'1W～3W', '3':'3W～5W', '5':'5W～10W', '10':'10W以上'}
-    for zone in zone_list:
-        num = zone.split('W')[0]
-        num_zone.append(num)
-    ordered_num_zone = sorted(num_zone)
-    max_zone = zone_dic[ordered_num_zone[-1]]
-    return max_zone
-
-reg_info = u'平台类型:银行,平台代码:GEO_0000002633,注册时间:2016-08-12 06:59:57平台类型:非银行,平台代码:GEO_0000184968,注册时间:2016-08-12 06:59:57平台类型:银行,平台代码:GEO_0000001806,注册时间:2016-08-12 06:59:57平台类型:银行,平台代码:GEO_0000000685,注册时间:2016-08-12 06:59:57'
-app_info = u'平台类型:银行,平台代码:GEO_0000001806,申请时间:2016-08-12 06:59:57,申请金额区间:0W～0.2W平台类型:银行,平台代码:GEO_0000002633,申请时间:2016-08-12 06:59:57,申请金额区间:0.5W～1W平台类型:银行,平台代码:GEO_0000000685,申请时间:2016-08-12 06:59:57,申请金额区间:10W以上平台类型:非银行,平台代码:GEO_0000184968,申请时间:2016-08-12 06:59:57,申请金额区间:3W～5W'
-loan_info = u'平台类型:银行,平台代码:GEO_0000001806,放款时间:2016-08-12 06:59:57,放款金额区间:0.2W～0.5W平台类型:非银行,平台代码:GEO_0000184968,放款时间:2016-08-12 06:59:57,放款金额区间:0.2W～0.5W平台类型:银行,平台代码:GEO_0000000685,放款时间:2016-08-12 06:59:57,放款金额区间:0.2W～0.5W平台类型:银行,平台代码:GEO_0000002633,放款时间:2016-08-12 06:59:57,放款金额区间:0.2W～0.5W'
-rej_info = u'平台类型:非银行,平台代码:GEO_0000001668,驳回时间:2017-01-30 12:10:01平台类型:非银行,平台代码:GEO_0000001668,驳回时间:2017-03-08 11:20:00'
-
-#注册统计
-reg = len(re.findall(u'平台类型',reg_info))
-reg_Bank = len(re.findall(u'平台类型:银行',reg_info))
-reg_NoBank = len(re.findall(u'平台类型:非银行',reg_info))
-
-#申请统计
-app = len(re.findall(u'平台类型', app_info))
-app_Bank = len(re.findall(u'平台类型:银行', app_info))
-app_NoBank = len(re.findall(u'平台类型:非银行', app_info))
-appMount_0t2k = len(re.findall(u'0W～0.2W', app_info))
-appMount_2t5k = len(re.findall(u'0.2W～0.5W', app_info))
-appMount_5t10k = len(re.findall(u'0.5W～1W', app_info))
-appMount_10t30k = len(re.findall(u'1W～3W', app_info))
-appMount_30t50k = len(re.findall(u'3W～5W', app_info))
-appMount_50t100k = len(re.findall(u'5W～10W', app_info))
-appMount_100kt = len(re.findall(u'10W以上', app_info))
-
-app_Mount = re.findall('\d*\.*\d*[W][～]\d*\.*\d*[W]|10W以上', app_info)
-max_app_zone = max_mount(app_Mount)
-
-#放款统计
-loan = len(re.findall(u'平台类型', loan_info))
-loan_Bank = len(re.findall(u'平台类型:银行', loan_info))
-loan_NoBank = len(re.findall(u'平台类型:非银行', loan_info))
-loanMount_0t2k = len(re.findall(u'0W～0.2W', loan_info))
-loanMount_2t5k = len(re.findall(u'0.2W～0.5W', loan_info))
-loanMount_5t10k = len(re.findall(u'0.5W～1W', loan_info))
-loanMount_10t30k = len(re.findall(u'1W～3W', loan_info))
-loanMount_30t50k = len(re.findall(u'3W～5W', loan_info))
-loanMount_50t100k = len(re.findall(u'5W～10W', loan_info))
-loanMount_100kt = len(re.findall(u'10W以上', loan_info))
-
-loan_Mount = re.findall('\d*\.*\d*[W][～]\d*\.*\d*[W]|10W以上', loan_info)
-max_loan_zone = max_mount(loan_Mount)
-
-#驳回统计
-rej = len(re.findall(u'平台类型',rej_info))
-rej_Bank = len(re.findall(u'平台类型:银行',rej_info))
-rej_NoBank = len(re.findall(u'平台类型:非银行',rej_info))
