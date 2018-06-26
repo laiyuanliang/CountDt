@@ -6,9 +6,9 @@ from openpyxl import load_workbook
 import re
 import datetime,time
 import traceback
+from sys import argv
 
-sourcefile = u'/home/laiyuanliang/CountDt/18eg.xlsx' 
-outputfile = u'/home/laiyuanliang/CountDt/18egout.xlsx'  
+script,sourcefile,outputfile = argv  
 
 def max_mount(zone_list):
     num_zone = []
@@ -135,7 +135,7 @@ for i in range(sheet_number):
                         rej_Bank = len(re.findall(u'平台类型:银行',rej_info))
                         rej_NoBank = len(re.findall(u'平台类型:非银行',rej_info))
                     else:
-                        rej =rej_Bank =reg_NoBank = 0
+                        rej =rej_Bank =rej_NoBank = 0
 
                     #Write File
                     ws.cell(column=1, row=writeIndex).value = serialNO
