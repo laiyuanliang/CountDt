@@ -8,7 +8,6 @@ import datetime,time
 import traceback
 from sys import argv
 
-# add a comment for test, will be delete soon
 script,sourcefile,outputfile = argv  
 
 def max_mount(zone_list):
